@@ -164,4 +164,9 @@ cython_debug/
 
 # Superset Local Repository
 /docker/superset/
+
+# DBT local environment
 /dbt-env/
+
+# DBT user
+/financial_data/.user.yml
