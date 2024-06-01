@@ -164,3 +164,4 @@ cython_debug/
 
 # Superset Local Repository
 /docker/superset/
+/dbt-env/
