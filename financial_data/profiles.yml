@@ -1,0 +1,12 @@
+financial_data:
+  outputs:
+    dev:
+      dbname: financial_data
+      host: localhost
+      pass: root
+      port: 5433
+      schema: public
+      threads: 1
+      type: postgres
+      user: admin
+  target: dev
