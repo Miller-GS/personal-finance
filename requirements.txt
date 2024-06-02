@@ -1,4 +1,5 @@
 dbt-postgres
 python-dotenv
-openpyxl
+pandas
 psycopg2
+sqlalchemy
