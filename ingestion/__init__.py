@@ -1,0 +1,1 @@
+POSTGRES_ENV_FILE = '../local_env/postgres/.env'

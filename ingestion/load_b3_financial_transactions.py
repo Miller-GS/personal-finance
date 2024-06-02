@@ -1,8 +1,7 @@
-import pandas as pd
 from connectors.postgres_connector import PostgresConnector
 from readers.excel_dataframe_reader import ExcelDataFrameReader
+from . import POSTGRES_ENV_FILE 
 
-POSTGRES_ENV_FILE = '../local_env/postgres/.env'
 FINANCIAL_TRANSACTIONS_FILE_PATTERN = "../source_data/b3_financial_transactions/movimentacao-*.xlsx"
 
 reader = ExcelDataFrameReader()
