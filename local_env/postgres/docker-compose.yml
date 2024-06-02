@@ -3,7 +3,7 @@ services:
   postgres:
     container_name: container-pg
     image: postgres
-    hostname: localhost
+    hostname: ${POSTGRES_HOSTNAME:-localhost}
     ports:
       - "${POSTGRES_PORT:-5433}:5432" # We're changing this because Superset also uses its own Postgres instance
     environment:
