@@ -172,4 +172,4 @@ cython_debug/
 /financial_data/.user.yml
 
 # Source data
-/source_data/b3_financial_transactions/
+/source_data/b3_financial_transactions/*.xlsx
