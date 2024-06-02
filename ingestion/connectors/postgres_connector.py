@@ -40,8 +40,8 @@ class PostgresConnector:
     def create_from_dot_env_file(dotenv_file: str):
         config = dotenv.dotenv_values(dotenv_file)
         return PostgresConnector(
-            host=config['POSTGRES_HOST'],
-            database=config['POSTGRES_DATABASE'],
+            host=config['POSTGRES_HOSTNAME'],
+            database=config['POSTGRES_DB'],
             user=config['POSTGRES_USER'],
             password=config['POSTGRES_PASSWORD'],
             port=config['POSTGRES_PORT']
