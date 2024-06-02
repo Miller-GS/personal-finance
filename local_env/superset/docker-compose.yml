@@ -27,7 +27,7 @@ x-superset-depends-on: &superset-depends-on
   - redis
 x-superset-volumes:
   &superset-volumes # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
-  - ./superset:/app/docker
+  - ./:/app/docker
   - superset_home:/app/superset_home
 
 version: "3.7"
@@ -41,22 +41,22 @@ services:
 
   db:
     env_file:
-      - path: superset/.env # default
+      - path: .env # default
         required: true
-      - path: superset/.env-local # optional override
+      - path: .env-local # optional override
         required: false
     image: postgres:15
     container_name: superset_db
     restart: unless-stopped
     volumes:
       - db_home:/var/lib/postgresql/data
-      - ./superset/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
   superset:
     env_file:
-      - path: superset/.env # default
+      - path: .env # default
         required: true
-      - path: superset/.env-local # optional override
+      - path: .env-local # optional override
         required: false
     image: *superset-image
     container_name: superset_app
@@ -73,9 +73,9 @@ services:
     container_name: superset_init
     command: ["/app/docker/docker-init.sh"]
     env_file:
-      - path: superset/.env # default
+      - path: .env # default
         required: true
-      - path: superset/.env-local # optional override
+      - path: .env-local # optional override
         required: false
     depends_on: *superset-depends-on
     user: "root"
@@ -88,9 +88,9 @@ services:
     container_name: superset_worker
     command: ["/app/docker/docker-bootstrap.sh", "worker"]
     env_file:
-      - path: superset/.env # default
+      - path: .env # default
         required: true
-      - path: superset/.env-local # optional override
+      - path: .env-local # optional override
         required: false
     restart: unless-stopped
     depends_on: *superset-depends-on
@@ -108,9 +108,9 @@ services:
     container_name: superset_worker_beat
     command: ["/app/docker/docker-bootstrap.sh", "beat"]
     env_file:
-      - path: superset/.env # default
+      - path: .env # default
         required: true
-      - path: superset/.env-local # optional override
+      - path: .env-local # optional override
         required: false
     restart: unless-stopped
     depends_on: *superset-depends-on
@@ -126,3 +126,7 @@ volumes:
     external: false
   redis:
     external: false
+
+networks:
+  default:
+    name: 'personal_finance_network'
