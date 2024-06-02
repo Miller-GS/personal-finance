@@ -1,4 +1,4 @@
 dbt-postgres
-dotenv
+python-dotenv
 openpyxl
 psycopg2
