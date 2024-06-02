@@ -2,6 +2,8 @@ import dotenv
 import sqlalchemy
 import pandas
 
+DEFAULT_POSTGRES_ENV_FILE = '../local_env/postgres/.env'
+
 class PostgresConnector:
     CONN_STRING_TEMPLATE = "postgresql://{user}:{password}@{hostname}:{port}/{database}" 
 
@@ -59,7 +61,7 @@ class PostgresConnector:
         self.connection.commit()
     
     @staticmethod
-    def create_from_dot_env_file(dotenv_file: str):
+    def create_from_dot_env_file(dotenv_file: str = DEFAULT_POSTGRES_ENV_FILE):
         config = dotenv.dotenv_values(dotenv_file)
         return PostgresConnector(
             host=config['POSTGRES_HOSTNAME'],
