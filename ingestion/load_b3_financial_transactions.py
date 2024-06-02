@@ -10,4 +10,4 @@ df_financial_transactions = reader.read_with_glob_pattern(FINANCIAL_TRANSACTIONS
 
 postgres_connector = PostgresConnector.create_from_dot_env_file(POSTGRES_ENV_FILE)
 with postgres_connector:
-    postgres_connector.save_dataframe(df_financial_transactions, 'financial_transactions', 'raw', 'replace')
+    postgres_connector.save_dataframe(df_financial_transactions, 'b3_financial_transactions', 'raw', 'replace')
