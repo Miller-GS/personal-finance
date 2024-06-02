@@ -1,40 +1,62 @@
-import psycopg2
 import dotenv
+import sqlalchemy
+import pandas
 
 class PostgresConnector:
-    def __init__(self, host, database, user, password, port):
+    CONN_STRING_TEMPLATE = "postgresql://{user}:{password}@{hostname}:{port}/{database}" 
+
+    def __init__(self, host: str, database: str, user: str, password: str, port: str) -> None:
         self.host = host
         self.database = database
         self.user = user
         self.password = password
         self.port = port
-        self.connection = None
-        self.cursor = None
+        self.connection_string = PostgresConnector.CONN_STRING_TEMPLATE.format(
+            user=self.user,
+            password=self.password,
+            hostname=self.host,
+            port=self.port,
+            database=self.database
+        )
+        self.engine = sqlalchemy.create_engine(self.connection_string)
         self.is_connected = False
 
-    def open(self):
-        self.connection = psycopg2.connect(host=self.host, database=self.database, user=self.user, password=self.password, port=self.port)
-        self.cursor = self.connection.cursor()
+    def open(self) -> None:
+        self.connection = self.engine.connect()
         self.is_connected = True
 
-    def close(self):
-        self.cursor.close()
+    def close(self) -> None:
         self.connection.close()
         self.is_connected = False
 
-    def __enter__(self):
+    def __enter__(self) -> 'PostgresConnector':
         self.open()
         return self
     
-    def __exit__(self, *_):
+    def __exit__(self, *_) -> None:
         self.close()
 
-    def execute(self, query: str) -> list:
+    def assert_connected(self) -> None:
         if not self.is_connected:
-            raise Exception('Not connected to database')
+            raise ConnectionError('Not connected to database')
 
-        self.cursor.execute(query)
-        return self.cursor.fetchall()
+    def execute(self, query: str) -> sqlalchemy.Sequence:
+        self.assert_connected()
+
+        return self.connection.execute(sqlalchemy.text(query)).fetchall()
+    
+    def save_dataframe(self, dataframe: pandas.DataFrame, table_name: str, schema: str = 'public', if_exists: str = 'fail') -> None:
+        self.assert_connected()
+
+        self.connection.execute(sqlalchemy.schema.CreateSchema("raw", if_not_exists=True))
+        dataframe.to_sql(
+            table_name,
+            self.connection,
+            schema=schema,
+            if_exists=if_exists,
+            index=False
+        )
+        self.connection.commit()
     
     @staticmethod
     def create_from_dot_env_file(dotenv_file: str):
