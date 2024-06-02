@@ -1,0 +1,3 @@
+dbt-postgres
+openpyxl
+psycopg2
