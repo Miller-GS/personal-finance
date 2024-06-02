@@ -1,0 +1,16 @@
+
+version: 2
+
+sources:
+  - name: b3
+    description: "Data from the B3 stock exchange"
+    database: financial_data
+    schema: raw
+    tables:
+      - name: b3_financial_transactions
+        description: "Raw financial transactions from the B3 stock exchange"
+models:
+  - name: b3__staging__financial_transactions
+    description: "Financial transactions from the B3 stock exchange"
+    config:
+      schema: staging
