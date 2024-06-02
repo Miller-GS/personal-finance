@@ -48,7 +48,7 @@ class PostgresConnector:
     def save_dataframe(self, dataframe: pandas.DataFrame, table_name: str, schema: str = 'public', if_exists: str = 'fail') -> None:
         self.assert_connected()
 
-        self.connection.execute(sqlalchemy.schema.CreateSchema("raw", if_not_exists=True))
+        self.connection.execute(sqlalchemy.schema.CreateSchema(schema, if_not_exists=True))
         dataframe.to_sql(
             table_name,
             self.connection,
