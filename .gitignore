@@ -170,3 +170,6 @@ cython_debug/
 
 # DBT user
 /financial_data/.user.yml
+
+# Source data
+/source_data/b3_financial_transactions/
