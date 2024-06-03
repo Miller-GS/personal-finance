@@ -11,7 +11,7 @@ SELECT
     "Instituição" AS financial_institution,
     CASE
         -- Apparently B3 is sometimes rounding the number of units in fractional auctions. We need to fix it here.
-        WHEN "Movimentação" = 'Leilão de Fração' THEN ROUND("Valor da Operação"::NUMERIC/"Preço unitário"::NUMERIC, 3)
+        WHEN "Movimentação" = 'Leilão de Fração' THEN ROUND("Valor da Operação"::NUMERIC/"Preço unitário"::NUMERIC, 2)
         ELSE "Quantidade"::NUMERIC
     END AS number_of_units,
     NULLIF("Preço unitário", '-')::NUMERIC AS price_per_unit_brl,
