@@ -18,3 +18,7 @@ models:
     description: "Stock transactions (buying or selling) from the B3 stock exchange, with the average cost up to that point computed"
     config:
       schema: staging
+  - name: b3__staging__products
+    description: "Contains all unique product names that show up in B3 transactions. It also generates a common SK products with the same code."
+    config:
+      schema: staging
