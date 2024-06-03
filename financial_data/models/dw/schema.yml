@@ -1,0 +1,8 @@
+
+version: 2
+
+models:
+  - name: dim_product
+    description: "Dimension that contains all unique products"
+    config:
+      schema: dw
