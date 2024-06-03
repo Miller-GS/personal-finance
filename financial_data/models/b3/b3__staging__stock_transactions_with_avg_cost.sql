@@ -2,31 +2,36 @@
 
 WITH sorted_transactions AS (
     SELECT
-        product,
+        p.sk_product,
+        ft.product,
         CASE
             -- We have to invert here because when we are credited what we were owned from the auction,
             -- we have the debit of that fraction of stock. The last part is what we're interested here.
             -- We do have it from the B3 data, however since the debit happens before the auction, we "lose" some data.
-            WHEN transaction_type = 'Leilão de Fração' THEN 'Debit'
+            WHEN ft.transaction_type = 'Leilão de Fração' THEN 'Debit'
             -- Similarly, when stocks are grouped, instead of treating it as a debit, we're going to treat it as a credit.
             -- This is because we're going to consider the average cost of the stock, and the groupment is a way to "sell" the stock.
-            WHEN transaction_type = 'Grupamento' THEN 'Debit'
-            ELSE debit_or_credit 
+            WHEN ft.transaction_type = 'Grupamento' THEN 'Debit'
+            ELSE ft.debit_or_credit 
         END debit_or_credit,
-        number_of_units,
-        price_per_unit_brl,
-        total_price_brl,
-        transaction_type,
-        transaction_date,
-        ROW_NUMBER() OVER(PARTITION BY product ORDER BY transaction_date) AS rw
+        ft.number_of_units,
+        ft.price_per_unit_brl,
+        ft.total_price_brl,
+        ft.transaction_type,
+        ft.transaction_date,
+        ROW_NUMBER() OVER(PARTITION BY p.sk_product ORDER BY ft.transaction_date) AS rw
     FROM
-        {{ ref('b3__staging__financial_transactions') }}
+        {{ ref('b3__staging__financial_transactions') }} AS ft
+    JOIN
+        {{ ref('b3__staging__products') }} AS p
+            ON ft.product = p.product
     WHERE
         transaction_type IN ('Transferência - Liquidação', 'Bonificação em Ativos', 'Leilão de Fração', 'Grupamento')
 ),
 transactions_with_avg_cost AS (
     WITH RECURSIVE prev_row AS (
         SELECT
+            sk_product,
             product,
             debit_or_credit,
             transaction_type,
@@ -44,6 +49,7 @@ transactions_with_avg_cost AS (
             rw = 1
         UNION ALL
         SELECT
+            st.sk_product,
             st.product,
             st.debit_or_credit,
             st.transaction_type,
@@ -78,10 +84,11 @@ transactions_with_avg_cost AS (
             prev_row AS p
         JOIN
             sorted_transactions AS st
-                ON p.product = st.product
+                ON p.sk_product = st.sk_product
                 AND p.rw + 1 = st.rw
     )
     SELECT
+        sk_product,
         product,
         debit_or_credit,
         transaction_type,
@@ -99,7 +106,7 @@ transactions_with_avg_cost AS (
         ROUND(acc_total_cost_brl, 3) AS acc_total_cost_brl,
         ROUND(COALESCE(acc_total_cost_brl / NULLIF(acc_units, 0), previous_acc_avg_cost_brl), 3) AS acc_avg_cost_brl,
         transaction_date,
-        LEAD(transaction_date) OVER(PARTITION BY product ORDER BY transaction_date) AS next_transaction_date_for_same_product
+        LEAD(transaction_date) OVER(PARTITION BY sk_product ORDER BY transaction_date) AS next_transaction_date_for_same_product
     FROM
         prev_row
 )
