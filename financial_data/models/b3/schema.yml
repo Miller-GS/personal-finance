@@ -14,3 +14,7 @@ models:
     description: "Financial transactions from the B3 stock exchange"
     config:
       schema: staging
+  - name: b3__staging__stock_transactions_with_avg_cost
+    description: "Stock transactions (buying or selling) from the B3 stock exchange, with the average cost up to that point computed"
+    config:
+      schema: staging
