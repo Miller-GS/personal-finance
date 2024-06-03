@@ -19,7 +19,7 @@ WITH sorted_transactions AS (
         ft.total_price_brl,
         ft.transaction_type,
         ft.transaction_date,
-        ROW_NUMBER() OVER(PARTITION BY p.sk_product ORDER BY ft.transaction_date) AS rw
+        ROW_NUMBER() OVER(PARTITION BY p.sk_product ORDER BY ft.transaction_date) AS transaction_nr_for_product
     FROM
         {{ ref('b3__staging__financial_transactions') }} AS ft
     JOIN
@@ -42,11 +42,11 @@ transactions_with_avg_cost AS (
             (CASE WHEN debit_or_credit = 'Credit' THEN 1 END) * total_price_brl AS acc_total_cost_brl,
             NULL::NUMERIC AS previous_acc_avg_cost_brl,
             transaction_date,
-            rw
+            transaction_nr_for_product
         FROM
             sorted_transactions
         WHERE
-            rw = 1
+            transaction_nr_for_product = 1
         UNION ALL
         SELECT
             st.sk_product,
@@ -79,13 +79,13 @@ transactions_with_avg_cost AS (
             )::NUMERIC AS acc_total_cost_brl,
             p.acc_total_cost_brl / p.acc_units AS previous_acc_avg_cost_brl,
             st.transaction_date,
-            st.rw
+            st.transaction_nr_for_product
         FROM
             prev_row AS p
         JOIN
             sorted_transactions AS st
                 ON p.sk_product = st.sk_product
-                AND p.rw + 1 = st.rw
+                AND p.transaction_nr_for_product + 1 = st.transaction_nr_for_product
     )
     SELECT
         sk_product,
@@ -105,6 +105,7 @@ transactions_with_avg_cost AS (
         ROUND(acc_units, 3) AS acc_units,
         ROUND(acc_total_cost_brl, 3) AS acc_total_cost_brl,
         ROUND(COALESCE(acc_total_cost_brl / NULLIF(acc_units, 0), previous_acc_avg_cost_brl), 3) AS acc_avg_cost_brl,
+        transaction_nr_for_product,
         transaction_date,
         LEAD(transaction_date) OVER(PARTITION BY sk_product ORDER BY transaction_date) AS next_transaction_date_for_same_product
     FROM
