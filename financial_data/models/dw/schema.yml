@@ -1,8 +1,20 @@
 
 version: 2
 
+sources:
+  - name: dw
+    description: "Sources inputed directly into DW. Usually auxiliary tables, like dim_date."
+    database: financial_data
+    schema: dw
+    tables:
+      - name: dim_date
+        description: "Date dimension"
 models:
   - name: dim_product
     description: "Dimension that contains all unique products"
+    config:
+      schema: dw
+  - name: fact_daily_stock_ownership
+    description: "Daily snapshot of stocks owned by the user"
     config:
       schema: dw
