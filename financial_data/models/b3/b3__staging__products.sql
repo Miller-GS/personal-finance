@@ -38,6 +38,9 @@ products_with_synonyms AS (
 )
 SELECT
     {{ dbt_utils.generate_surrogate_key(['product_code', 'product_type']) }} AS sk_product,
-    *
+    product,
+    FIRST_VALUE(product) OVER(PARTITION BY product_code, product_type ORDER BY first_appearance_date DESC) AS latest_product_name,
+    product_type,
+    first_appearance_date
 FROM
     products_with_synonyms
