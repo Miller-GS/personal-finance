@@ -98,7 +98,8 @@ transactions_with_avg_cost AS (
         ROUND(acc_units, 3) AS acc_units,
         ROUND(acc_total_cost_brl, 3) AS acc_total_cost_brl,
         ROUND(COALESCE(acc_total_cost_brl / NULLIF(acc_units, 0), previous_acc_avg_cost_brl), 3) AS acc_avg_cost_brl,
-        transaction_date
+        transaction_date,
+        LEAD(transaction_date) OVER(PARTITION BY product ORDER BY transaction_date) AS next_transaction_date_for_same_product
     FROM
         prev_row
 )
