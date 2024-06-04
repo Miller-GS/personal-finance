@@ -12,6 +12,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-financial_data}
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     restart: unless-stopped
 
   pgadmin:
