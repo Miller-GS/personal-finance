@@ -2,6 +2,7 @@ import re
 import sys
 import yfinance as yf
 import pandas as pd
+import numpy as np
 from datetime import datetime
 from connectors.postgres_connector import PostgresConnector
 from readers.excel_dataframe_reader import ExcelDataFrameReader
@@ -51,12 +52,17 @@ def get_stock_price_history(tickers: set[str], start_date: datetime, end_date: d
     for ticker in tickers:
         print(f"Fetching stock price history for {ticker}")
         df = get_stock_price_history_from_ticker(ticker, start_date, end_date)
-        dfs.append(df)
+        if df is not None:
+            dfs.append(df)
     return pd.concat(dfs)
 
 def get_stock_price_history_from_ticker(ticker_name: str, start_date: datetime, end_date: datetime) -> pd.DataFrame:
     ticker_obj = yf.Ticker(f"{ticker_name}.SA")
-    history = ticker_obj.history(start=start_date, end=end_date)
+    history = ticker_obj.history(start=start_date, end=end_date, auto_adjust=False)
+    if history.empty:
+        return None
+    history.sort_index(inplace=True, ascending=False)
+    history["split_factor_acc"] = history["Stock Splits"].replace(0, 1).cumprod().fillna(1)
     history.reset_index(inplace=True)
     history["ticker"] = ticker_name
     return history
