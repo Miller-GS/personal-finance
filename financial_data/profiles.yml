@@ -6,7 +6,7 @@ financial_data:
       pass: root
       port: 5433
       schema: public
-      threads: 1
+      threads: 4
       type: postgres
       user: admin
   target: dev
