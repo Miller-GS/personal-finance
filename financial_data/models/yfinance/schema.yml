@@ -1,0 +1,20 @@
+
+version: 2
+
+sources:
+  - name: yfinance
+    description: "Data from Yahoo Finance API"
+    database: financial_data
+    schema: raw
+    tables:
+      - name: stock_price_history
+        description: "Raw stock price history from Yahoo Finance API"
+models:
+  - name: yfinance__staging__stock_price_history
+    description: "Stock price history from Yahoo Finance API"
+    config:
+      schema: staging
+  - name: yfinance__staging__daily_stock_close_price
+    description: "Daily stock close price from Yahoo Finance API. It fills in days with closed market with the last available price."
+    config:
+      schema: staging
