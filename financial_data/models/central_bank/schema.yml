@@ -1,0 +1,24 @@
+
+version: 2
+
+sources:
+  - name: central_bank
+    description: "Raw data from the Brazilian Central Bank (BCB)."
+    database: financial_data
+    schema: raw
+    tables:
+      - name: central_bank_cdi_daily
+        description: "Each row represents the daily CDI (Certificados de Depósitos Interbancários) rate overnight. It does not include weekends or holidays."
+      - name: central_bank_selic_goal_daily
+        description: "Each row represents what the yearly SELIC (Sistema Especial de Liquidação e de Custódia) goal (Meta Selic Anual) was in a given day. It includes weekends and holidays."
+      - name: central_bank_ipca_monthly
+        description: "Each row represents the monthly IPCA (Índice Nacional de Preços ao Consumidor Amplo) rate."
+models:
+  - name: central_bank__staging__cdi_daily
+    description: "Each row represents the daily CDI (Certificados de Depósitos Interbancários) rate overnight. It does includes weekends and holidays with 0 rate."
+    config:
+      schema: staging
+  - name: central_bank__staging__ipca_monthly
+    description: "Each row represents the monthly IPCA (Índice Nacional de Preços ao Consumidor Amplo) rate."
+    config:
+      schema: staging
