@@ -2,6 +2,7 @@
 
 SELECT
     sk_product,
+    ANY_VALUE(product_code) AS product_code,
     ANY_VALUE(latest_product_name) AS latest_product_name,
     ARRAY_AGG(product) AS all_product_names,
     ANY_VALUE(product_type) AS product_type,
